@@ -67,6 +67,21 @@ val npmTest = tasks.register<Exec>("npmTest") {
     commandLine(npmExecutable, "run", "test", "--if-present")
 }
 
+val npmRunDev = tasks.register<Exec>("npmRunDev") {
+    group = LifecycleBasePlugin.BUILD_GROUP
+    description = "Run npm dev for ${project.name} when the package defines it."
+    workingDir = projectDir
+    dependsOn(npmInstall)
+
+    inputs.file(packageJson)
+        .withPropertyName("packageJson")
+    inputs.dir(srcDirectory)
+        .withPropertyName("src")
+        .optional()
+
+    commandLine(npmExecutable, "run", "dev", "--if-present")
+}
+
 val npmBuild = tasks.register<Exec>("npmBuild") {
     group = LifecycleBasePlugin.BUILD_GROUP
     description = "Build the Vite/React web app for ${project.name}."

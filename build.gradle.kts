@@ -5,7 +5,7 @@ import org.gradle.api.tasks.testing.Test
 import org.w3c.dom.Element
 
 allprojects {
-    group = "solutions.onz.platform.demon"
+    group = "solutions.onz.platform.strato"
     version = "1.0.0"
 }
 

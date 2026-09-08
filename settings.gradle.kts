@@ -20,5 +20,5 @@ rootProject.name = "strato"
 
 include(
     ":strato-creator",
-    "strato-app-fe"
+    ":strato-app-fe"
 )
