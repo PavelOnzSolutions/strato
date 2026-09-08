@@ -1,0 +1,7 @@
+query {
+    configurations {
+        id
+        name
+        data
+    }
+}

@@ -1,0 +1,130 @@
+[
+  {
+    "name": "Compute",
+    "key": "cmp",
+    "color": "tomato",
+    "isSystem": true,
+    "defaultProperties": {
+      "name": "string",
+      "sku": "string",
+      "size": "string",
+      "region": "string"
+    }
+  },
+  {
+    "name": "Storage",
+    "key": "stg",
+    "color": "grass",
+    "isSystem": true,
+    "defaultProperties": {
+      "name": "string",
+      "sku": "string",
+      "region": "string"
+    }
+  },
+  {
+    "name": "Networking",
+    "key": "net",
+    "color": "crimson",
+    "isSystem": true,
+    "defaultProperties": {
+      "name": "string",
+      "sku": "string",
+      "region": "string"
+    }
+  },
+  {
+    "name": "Infrastructure",
+    "key": "inf",
+    "color": "sky",
+    "isSystem": true,
+    "defaultProperties": {
+      "name": "string",
+      "sku": "string",
+      "region": "string"
+    }
+  },
+  {
+    "name": "Database",
+    "key": "dbs",
+    "color": "yellow",
+    "isSystem": true,
+    "defaultProperties": {
+      "name": "string",
+      "sku": "string",
+      "region": "string"
+    }
+  },
+  {
+    "name": "Subscription",
+    "key": "sub",
+    "color": "cyan",
+    "isSystem": true,
+    "defaultProperties": {
+      "name": "string",
+      "region": "string"
+    }
+  },
+  {
+    "name": "Integration",
+    "key": "int",
+    "color": "brown",
+    "isSystem": true,
+    "defaultProperties": {
+      "name": "string",
+      "region": "string"
+    }
+  },
+  {
+    "name": "Monitoring",
+    "key": "mon",
+    "color": "lime",
+    "isSystem": true,
+    "defaultProperties": {
+      "name": "string",
+      "region": "string"
+    }
+  },
+  {
+    "name": "Other",
+    "key": "oth",
+    "color": "gold",
+    "isSystem": true,
+    "defaultProperties": {
+      "name": "string"
+    }
+  },
+  {
+    "name": "Analytics",
+    "key": "ana",
+    "color": "indigo",
+    "isSystem": true
+  },
+  {
+    "name": "Identity",
+    "key": "idt",
+    "color": "ruby",
+    "isSystem": true,
+    "defaultProperties": {}
+  },
+  {
+    "name": "Azure Region",
+    "key": "azreg",
+    "color": "mint",
+    "isSystem": true
+  },
+  {
+    "name": "MS Graph API",
+    "key": "msgraph",
+    "color": "plum",
+    "isSystem": true,
+    "defaultProperties": {}
+  },
+  {
+    "name": "Catalog",
+    "key": "cat",
+    "color": "bronze",
+    "isSystem": true,
+    "defaultProperties": {}
+  }
+]

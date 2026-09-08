@@ -1,0 +1,92 @@
+spring:
+  application:
+    name: strato-creator
+  data:
+    mongodb:
+      # Provide sensible defaults and allow override via environment variables
+      database: ${SPRING_DATA_MONGODB_DATABASE:strato-creator}
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/strato-creator}
+      auto-index-creation: true
+  mvc:
+    problemdetails:
+      enabled: true
+  ai:
+    mcp:
+      server:
+        enabled: false
+        name: strato-creator
+  graphql:
+    cors:
+      allow-credentials: true
+      allowed-origins: "*"
+      allowed-methods: "*"
+    graphiql:
+      enabled: true
+      mapping: /graphiql
+
+springdoc:
+  api-docs:
+    enabled: true
+    resolve-extensions-properties: true
+    resolve-schema-properties: true
+  show-actuator: true
+  swagger-ui:
+    syntax-highlight:
+      activated: true
+
+
+management:
+  info:
+    process:
+      enabled: true
+    git:
+      mode: full
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    metrics:
+      export:
+        enabled: false
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  health:
+    mongo:
+      enabled: true
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+      roles: "PERM_HEALTH_READ,PERM_HEALTH_WRITE"
+    metrics:
+      access: read_only
+    info:
+      access: read_only
+    prometheus:
+      access: read_only
+    logfile:
+      access: read_only
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - caches
+          - strato-metrics
+          - prometheus
+          - logfile
+      base-path: /api/management
+
+mongock:
+  migration-scan-package: solutions.onz.platform.strato.creator.dataseed
+  transaction-strategy: change_unit
+
+logging:
+  file:
+    name: "./strato.log"
+
+

@@ -1,0 +1,44 @@
+type Query {
+    configurations(search: String): [Configuration]
+    configurationById(id: ID!): Configuration
+    configurationVersions(documentId: ID!): [Configuration]
+    configurationQuery(id: ID!, query: String): JSON
+    environments: [Environment]
+    environmentById(id: ID!): Environment
+    configProviderOutput(configurationId: ID!, environmentId: ID): ConfigProviderOutput
+    configProviderQuery(configName: String!, envName: String!, query: String!): JSON
+}
+
+type Configuration {
+    id: ID
+    name: String
+    schemaDocumentId: ID
+    documentId: ID
+    version: Int
+    deleted: Boolean
+    createdBy: String
+    createdDate: DateTime
+    data: JSON
+    environmentId: ID
+    environment: Environment
+}
+
+type ConfigProviderOutput {
+    configurationName: String
+    environmentName: String
+    version: Int
+    data: JSON
+}
+
+type Environment {
+    id: ID
+    name: String
+    documentId: ID
+    version: Int
+    deleted: Boolean
+    createdBy: String
+    createdDate: DateTime
+}
+
+scalar JSON
+scalar DateTime

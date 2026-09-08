@@ -1,0 +1,57 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+parameters:
+  - name: azureSubscription
+    displayName: Azure ARM sub
+    type: string
+    default: FidooFXTest
+
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: buildWebApp
+    jobs:
+      - job: build
+        steps:
+          - checkout: self
+          - task: UseNode@1
+            inputs:
+              version: "22.x"
+          - task: Npm@1
+            inputs:
+              command: install
+          - task: Npm@1
+            env:
+              VITE_PROD: true
+              VITE_API_BASE_URL: https://app-arborist-dev.azurewebsites.net/api
+              VITE_WS_URL: https://app-arborist-dev.azurewebsites.net/ws
+              VITE_BRAND: Direct Next a.s.
+            inputs:
+              command: "custom"
+              customCommand: "run build"
+          - task: AzureCLI@2
+            displayName: Retrieve Static Web App Deployment Token
+            inputs:
+              azureSubscription: ${{parameters.azureSubscription}}
+              scriptType: pscore
+              scriptLocation: inlineScript
+              inlineScript: |
+                $apiKey = az staticwebapp secrets list --name swa-arborist-dev --query "properties.apiKey" -o tsv
+                Write-Host "Deployment API Key:  $apiKey"
+                Write-Host "##vso[task.setvariable variable=STATICAPP_API_KEY]$($apiKey)"
+              addSpnToEnvironment: true
+          - task: AzureStaticWebApp@0
+            inputs:
+              app_location: "dist"
+              skip_app_build: true
+              skip_api_build: true
+              config_file_location: ./src
+              azure_static_web_apps_api_token: "$(STATICAPP_API_KEY)"

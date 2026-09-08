@@ -1,0 +1,7 @@
+services:
+  mongodb:
+    image: 'mongo:7'
+    environment:
+      - 'MONGO_INITDB_DATABASE=strato-creator'
+    ports:
+      - '27017:27017'

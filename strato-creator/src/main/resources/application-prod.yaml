@@ -1,0 +1,82 @@
+spring:
+  data:
+    mongodb:
+      uri: ${AZURE_COSMOS_CONNECTIONSTRING:mongodb://localhost:27017/strato-creator}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          azure:
+            client-id: ${AZURE_CLIENT_ID:}
+            client-secret: ${AZURE_CLIENT_SECRET:}
+            redirect-uri: https://${WEBSITE_HOSTNAME}/login/oauth2/code/azure
+            authorization-grant-type: authorization_code
+            scope:
+              - openid
+              - profile
+              - email
+              - https://graph.microsoft.com/User.Read.All
+              - https://graph.microsoft.com/Directory.ReadWrite.All
+              - https://graph.microsoft.com/Directory.AccessAsUser.All
+              - https://graph.microsoft.com/User.Read
+        provider:
+          azure:
+            issuer-uri: ${AZURE_ISSUER_URI:}
+  graphql:
+    cors:
+      allowed-origins: ${strato.frontend.base-url}
+  ai:
+    mcp:
+      server:
+        enabled: false
+
+strato:
+  llm:
+    endpoint: ${LLM_ENDPOINT}
+    apiKey: ${LLM_API_KEY}
+    deployment-name: ${LLM_MODEL}
+    duck-duck-go:
+      enabled: true
+  security:
+    jwt:
+      issuer: https://${WEBSITE_HOSTNAME}
+      ttl-seconds: ${JWT_TTL_SECONDS:3600}
+      private-key-location: ${JWT_PRIVATE_KEY_LOCATION:classpath:keys/private.pem}
+      public-key-location: ${JWT_PUBLIC_KEY_LOCATION:classpath:keys/public.pem}
+    issuance:
+      api-key: ${ISSUANCE_API_KEY:change-me}
+    azure:
+      issuer-uri: ${AZURE_ISSUER_URI:}
+      key-vault-name: ${KEY_VAULT_NAME:}
+      tenant-id: ${AZURE_TENANT_ID:}
+      client-id: ${AZURE_CLIENT_ID:}
+      client-secret: ${AZURE_CLIENT_SECRET:}
+    csp:
+      policy-directives: "frame-ancestors 'self' ${strato.frontend.base-url}"
+  frontend:
+    base-url: ${FRONTEND_BASE_URL:http://localhost:5173}
+  azure-arm:
+    subscription-id: ${AZURE_SUBSCRIPTION_ID:}
+    default-region: ${AZURE_DEFAULT_REGION:westeurope}
+# NOTE: In production, store RSA private keys and issuance API keys in Azure Key Vault or a managed KMS, not in plain config.
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    metrics:
+      export:
+        enabled: false
+        url: ${APP_INSIGHTS_CONNECTION_STRING:http://localhost:4317}
+
+logging:
+  level:
+    root: info
+    org.springframework.web.socket.config: warn
+  file:
+    name: "/home/LogFiles/strato.log"
+springdoc:
+  swagger-ui:
+    enabled: true # TODO: Move the SwaggerUI to webapp and disable UI from BE in prod.

@@ -1,0 +1,2511 @@
+[
+  {
+    "name": "Resource Group",
+    "abbreviation": "rg",
+    "isSystem": true,
+    "icon": "azure/Resource-Groups.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "oth"
+    },
+    "namingRule": {
+      "maxLength": 90,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2024-03-01",
+      "tags": "{{ tags:object }}",
+      "properties": {}
+    },
+    "defaults": {
+      "tags": "{}"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "Virtual Machine",
+    "abbreviation": "vm",
+    "isSystem": true,
+    "icon": "azure/Virtual-Machine.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "cmp"
+    },
+    "namingRule": {
+      "maxLength": 64,
+      "minLength": 1,
+      "format": "{abbrv}-{env}-{name}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2024-07-01",
+      "tags": "{{ tags:object }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "zones": "{{ zones:array:string }}",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "{{ vmSize:string! }}"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "{{ imagePublisher:string! }}",
+            "offer": "{{ imageOffer:string! }}",
+            "sku": "{{ imageSku:string! }}",
+            "version": "{{ imageVersion:string }}"
+          },
+          "osDisk": {
+            "name": "{{ osDiskName:string }}",
+            "createOption": "FromImage",
+            "caching": "{{ osDiskCaching:string }}",
+            "managedDisk": {
+              "storageAccountType": "{{ osDiskStorageType:string }}"
+            },
+            "diskSizeGB": "{{ osDiskSizeGB:number }}"
+          },
+          "dataDisks": "{{ dataDisks:array:object }}"
+        },
+        "osProfile": {
+          "computerName": "{{ computerName:string! }}",
+          "adminUsername": "{{ adminUser:string! }}",
+          "adminPassword": "{{ adminPassword:string! }}",
+          "windowsConfiguration": {
+            "provisionVMAgent": true,
+            "enableAutomaticUpdates": true,
+            "patchSettings": {
+              "patchMode": "{{ patchMode:string }}"
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": "{{ networkInterfaces:array:object }}"
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true
+          }
+        },
+        "securityProfile": {
+          "encryptionAtHost": "{{ encryptionAtHost:boolean }}",
+          "securityType": "{{ securityType:string }}"
+        }
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "zones": "[]",
+      "properties-hardwareProfile-vmSize": "Standard_DS1_v2",
+      "properties-storageProfile-imageReference-publisher": "MicrosoftWindowsServer",
+      "properties-storageProfile-imageReference-offer": "WindowsServer",
+      "properties-storageProfile-imageReference-sku": "2022-Datacenter",
+      "properties-storageProfile-imageReference-version": "latest",
+      "properties-storageProfile-osDisk-caching": "ReadWrite",
+      "properties-storageProfile-osDisk-storageAccountType": "Premium_LRS",
+      "properties-storageProfile-osDisk-diskSizeGB": "128",
+      "patchMode": "AutomaticByPlatform",
+      "encryptionAtHost": "false",
+      "securityType": "TrustedLaunch"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "principalId": "identity.principalId"
+    }
+  },
+  {
+    "name": "Virtual Machine Scale Set",
+    "abbreviation": "vmss",
+    "isSystem": true,
+    "icon": "azure/Virtual-Machine.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "cmp"
+    },
+    "namingRule": {
+      "maxLength": 64,
+      "minLength": 1,
+      "format": "{abbrv}-{env}-{name}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "apiVersion": "2024-07-01",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ vmSize:string! }}",
+        "tier": "Standard",
+        "capacity": "{{ instanceCount:number! }}"
+      },
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "overprovision": true,
+        "upgradePolicy": {
+          "mode": "{{ upgradeMode:string }}"
+        },
+        "singlePlacementGroup": true,
+        "platformFaultDomainCount": 1,
+        "zoneBalance": false
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "vmSize": "Standard_DS2_v2",
+      "instanceCount": "2",
+      "upgradeMode": "Manual"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "Network Interface",
+    "abbreviation": "nic",
+    "isSystem": true,
+    "icon": "azure/Network-Interfaces.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "net"
+    },
+    "namingRule": {
+      "maxLength": 80,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2024-01-01",
+      "tags": "{{ tags:object }}",
+      "properties": {
+        "enableAcceleratedNetworking": "{{ enableAcceleratedNetworking:boolean }}",
+        "enableIPForwarding": "{{ enableIPForwarding:boolean }}",
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "{{ privateIPAllocationMethod:string }}",
+              "privateIPAddressVersion": "IPv4",
+              "subnet": {
+                "id": "{{ subnetId:string! }}"
+              },
+              "publicIPAddress": {
+                "id": "{{ publicIPAddressId:string }}"
+              }
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id": "{{ networkSecurityGroupId:string }}"
+        }
+      }
+    },
+    "defaults": {
+      "enableAcceleratedNetworking": "false",
+      "enableIPForwarding": "false",
+      "privateIPAllocationMethod": "Dynamic"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "Virtual Network",
+    "abbreviation": "vnet",
+    "isSystem": true,
+    "icon": "azure/Virtual-Networks.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "net"
+    },
+    "namingRule": {
+      "maxLength": 64,
+      "minLength": 2,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2024-01-01",
+      "tags": "{{ tags:object }}",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": "{{ addressPrefixes:array:string! }}"
+        },
+        "subnets": "{{ subnets:array:object }}",
+        "dhcpOptions": {
+          "dnsServers": "{{ dnsServers:array:string }}"
+        },
+        "enableDdosProtection": "{{ enableDdosProtection:boolean }}",
+        "enableVmProtection": "{{ enableVmProtection:boolean }}"
+      }
+    },
+    "defaults": {
+      "addressPrefixes": "[\"10.0.0.0/16\"]",
+      "subnets": "[{\"name\":\"default\",\"properties\":{\"addressPrefix\":\"10.0.0.0/24\"}}]",
+      "dnsServers": "[]",
+      "enableDdosProtection": "false",
+      "enableVmProtection": "false"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "Subnet",
+    "abbreviation": "snet",
+    "isSystem": true,
+    "icon": "azure/Subnet.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "net"
+    },
+    "namingRule": {
+      "maxLength": 80,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2024-01-01",
+      "properties": {
+        "addressPrefix": "{{ addressPrefix:string! }}",
+        "networkSecurityGroup": {
+          "id": "{{ networkSecurityGroupId:string }}"
+        },
+        "routeTable": {
+          "id": "{{ routeTableId:string }}"
+        },
+        "natGateway": {
+          "id": "{{ natGatewayId:string }}"
+        },
+        "serviceEndpoints": "{{ serviceEndpoints:array:object }}",
+        "delegations": "{{ delegations:array:object }}",
+        "privateEndpointNetworkPolicies": "{{ privateEndpointNetworkPolicies:string }}",
+        "privateLinkServiceNetworkPolicies": "{{ privateLinkServiceNetworkPolicies:string }}"
+      }
+    },
+    "defaults": {
+      "addressPrefix": "10.0.0.0/24",
+      "serviceEndpoints": "[]",
+      "delegations": "[]",
+      "privateEndpointNetworkPolicies": "Disabled",
+      "privateLinkServiceNetworkPolicies": "Enabled"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "Network Security Group",
+    "abbreviation": "nsg",
+    "isSystem": true,
+    "icon": "azure/Network-Security-Groups.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "net"
+    },
+    "namingRule": {
+      "maxLength": 80,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2024-01-01",
+      "tags": "{{ tags:object }}",
+      "properties": {
+        "securityRules": "{{ securityRules:array:object }}"
+      }
+    },
+    "defaults": {
+      "securityRules": "[]"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "Public IP Address",
+    "abbreviation": "pip",
+    "isSystem": true,
+    "icon": "azure/Public-IP-Addresses.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "net"
+    },
+    "namingRule": {
+      "maxLength": 80,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2024-01-01",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}",
+        "tier": "{{ skuTier:string }}"
+      },
+      "zones": "{{ zones:array:string }}",
+      "properties": {
+        "publicIPAllocationMethod": "{{ publicIPAllocationMethod:string }}",
+        "publicIPAddressVersion": "{{ publicIPAddressVersion:string }}",
+        "idleTimeoutInMinutes": "{{ idleTimeoutInMinutes:number }}",
+        "dnsSettings": {
+          "domainNameLabel": "{{ domainNameLabel:string }}"
+        }
+      }
+    },
+    "defaults": {
+      "skuName": "Standard",
+      "skuTier": "Regional",
+      "publicIPAllocationMethod": "Static",
+      "publicIPAddressVersion": "IPv4",
+      "idleTimeoutInMinutes": "4",
+      "zones": "[]"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "ipAddress": "properties.ipAddress"
+    }
+  },
+  {
+    "name": "Load Balancer",
+    "abbreviation": "lb",
+    "isSystem": true,
+    "icon": "azure/Load-Balancers.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "net"
+    },
+    "namingRule": {
+      "maxLength": 80,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Network/loadBalancers",
+      "apiVersion": "2024-01-01",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}",
+        "tier": "{{ skuTier:string }}"
+      },
+      "properties": {
+        "frontendIPConfigurations": "{{ frontendIPConfigurations:array:object! }}",
+        "backendAddressPools": "{{ backendAddressPools:array:object }}",
+        "loadBalancingRules": "{{ loadBalancingRules:array:object }}",
+        "probes": "{{ probes:array:object }}",
+        "inboundNatRules": "{{ inboundNatRules:array:object }}",
+        "outboundRules": "{{ outboundRules:array:object }}"
+      }
+    },
+    "defaults": {
+      "skuName": "Standard",
+      "skuTier": "Regional",
+      "backendAddressPools": "[]",
+      "loadBalancingRules": "[]",
+      "probes": "[]",
+      "inboundNatRules": "[]",
+      "outboundRules": "[]"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "NAT Gateway",
+    "abbreviation": "ng",
+    "isSystem": true,
+    "icon": "azure/NAT.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "net"
+    },
+    "namingRule": {
+      "maxLength": 80,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Network/natGateways",
+      "apiVersion": "2024-01-01",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}"
+      },
+      "zones": "{{ zones:array:string }}",
+      "properties": {
+        "idleTimeoutInMinutes": "{{ idleTimeoutInMinutes:number }}",
+        "publicIpAddresses": "{{ publicIpAddresses:array:object }}",
+        "publicIpPrefixes": "{{ publicIpPrefixes:array:object }}"
+      }
+    },
+    "defaults": {
+      "skuName": "Standard",
+      "zones": "[]",
+      "publicIpAddresses": "[]",
+      "publicIpPrefixes": "[]",
+      "idleTimeoutInMinutes": "4"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "DNS Zone",
+    "abbreviation": "dns",
+    "isSystem": true,
+    "icon": "azure/DNS-Zones.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "net"
+    },
+    "template": {
+      "type": "Microsoft.Network/dnsZones",
+      "apiVersion": "2023-07-01-preview",
+      "location": "global",
+      "tags": "{{ tags:object }}",
+      "properties": {
+        "zoneType": "{{ zoneType:string }}"
+      }
+    },
+    "defaults": {
+      "zoneType": "Public"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "nameServers": "properties.nameServers"
+    }
+  },
+  {
+    "name": "Private Endpoint",
+    "abbreviation": "pe",
+    "isSystem": true,
+    "icon": "azure/Private-Link.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "net"
+    },
+    "namingRule": {
+      "maxLength": 80,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Network/privateEndpoints",
+      "apiVersion": "2024-01-01",
+      "tags": "{{ tags:object }}",
+      "properties": {
+        "subnet": {
+          "id": "{{ subnetId:string! }}"
+        },
+        "privateLinkServiceConnections": "{{ privateLinkServiceConnections:array:object! }}",
+        "manualPrivateLinkServiceConnections": "{{ manualPrivateLinkServiceConnections:array:object }}",
+        "customDnsConfigs": "{{ customDnsConfigs:array:object }}"
+      }
+    },
+    "defaults": {
+      "manualPrivateLinkServiceConnections": "[]",
+      "customDnsConfigs": "[]"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "Front Door",
+    "abbreviation": "afd",
+    "isSystem": true,
+    "icon": "azure/Front-Doors.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "net"
+    },
+    "namingRule": {
+      "maxLength": 64,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Cdn/profiles",
+      "apiVersion": "2024-02-01",
+      "location": "global",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}"
+      },
+      "properties": {
+        "originResponseTimeoutSeconds": "{{ originResponseTimeoutSeconds:number }}"
+      }
+    },
+    "defaults": {
+      "skuName": "Standard_AzureFrontDoor",
+      "originResponseTimeoutSeconds": "60"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "CDN Profile",
+    "abbreviation": "cdnp",
+    "isSystem": true,
+    "icon": "azure/CDN-Profiles.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "net"
+    },
+    "namingRule": {
+      "maxLength": 260,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Cdn/profiles",
+      "apiVersion": "2024-02-01",
+      "location": "global",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}"
+      },
+      "properties": {}
+    },
+    "defaults": {
+      "skuName": "Standard_Microsoft"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "App Service Plan",
+    "abbreviation": "asp",
+    "isSystem": true,
+    "icon": "azure/App-Service-Plans.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "cmp"
+    },
+    "namingRule": {
+      "maxLength": 40,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Web/serverFarms",
+      "apiVersion": "2023-12-01",
+      "tags": "{{ tags:object }}",
+      "sku": "{{ sku:catalog:allowed-plans }}",
+      "kind": "{{ kind:string }}",
+      "properties": {
+        "reserved": "{{ reserved:boolean }}",
+        "perSiteScaling": "{{ perSiteScaling:boolean }}",
+        "maximumElasticWorkerCount": "{{ maximumElasticWorkerCount:number }}",
+        "zoneRedundant": "{{ zoneRedundant:boolean }}",
+        "targetWorkerCount": "{{ targetWorkerCount:number }}"
+      }
+    },
+    "defaults": {
+      "skuName": "P1v3",
+      "skuTier": "PremiumV3",
+      "kind": "linux",
+      "reserved": "true",
+      "perSiteScaling": "false",
+      "zoneRedundant": "false"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "App Service",
+    "abbreviation": "app",
+    "isSystem": true,
+    "icon": "azure/App-Services.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "cmp"
+    },
+    "namingRule": {
+      "maxLength": 60,
+      "minLength": 2,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2023-12-01",
+      "tags": "{{ tags:object }}",
+      "kind": "{{ kind:string }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "serverFarmId": "{{ serverFarmId:string! }}",
+        "httpsOnly": "{{ httpsOnly:boolean }}",
+        "clientAffinityEnabled": "{{ clientAffinityEnabled:boolean }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "virtualNetworkSubnetId": "{{ virtualNetworkSubnetId:string }}",
+        "siteConfig": {
+          "linuxFxVersion": "{{ linuxFxVersion:string }}",
+          "windowsFxVersion": "{{ windowsFxVersion:string }}",
+          "alwaysOn": "{{ alwaysOn:boolean }}",
+          "ftpsState": "{{ ftpsState:string }}",
+          "minTlsVersion": "{{ minTlsVersion:string }}",
+          "http20Enabled": "{{ http20Enabled:boolean }}",
+          "use32BitWorkerProcess": "{{ use32BitWorkerProcess:boolean }}",
+          "webSocketsEnabled": "{{ webSocketsEnabled:boolean }}",
+          "remoteDebuggingEnabled": "{{ remoteDebuggingEnabled:boolean }}",
+          "healthCheckPath": "{{ healthCheckPath:string }}",
+          "appSettings": "{{ appSettings:array:object }}",
+          "connectionStrings": "{{ connectionStrings:array:object }}",
+          "cors": {
+            "allowedOrigins": "{{ corsAllowedOrigins:array:string }}",
+            "supportCredentials": "{{ corsSupportCredentials:boolean }}"
+          }
+        }
+      }
+    },
+    "defaults": {
+      "kind": "app",
+      "identityType": "SystemAssigned",
+      "httpsOnly": "true",
+      "clientAffinityEnabled": "false",
+      "publicNetworkAccess": "Enabled",
+      "alwaysOn": "true",
+      "ftpsState": "Disabled",
+      "minTlsVersion": "1.2",
+      "http20Enabled": "true",
+      "use32BitWorkerProcess": "false",
+      "webSocketsEnabled": "false",
+      "remoteDebuggingEnabled": "false",
+      "appSettings": "[]",
+      "connectionStrings": "[]",
+      "corsAllowedOrigins": "[]",
+      "corsSupportCredentials": "false"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "defaultHostName": "properties.defaultHostName",
+      "principalId": "identity.principalId"
+    }
+  },
+  {
+    "name": "Function App",
+    "abbreviation": "func",
+    "isSystem": true,
+    "icon": "azure/Function-Apps.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "cmp"
+    },
+    "namingRule": {
+      "maxLength": 60,
+      "minLength": 2,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2023-12-01",
+      "tags": "{{ tags:object }}",
+      "kind": "{{ kind:string }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "serverFarmId": "{{ serverFarmId:string! }}",
+        "httpsOnly": "{{ httpsOnly:boolean }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "siteConfig": {
+          "linuxFxVersion": "{{ frameworkVersion:string }}",
+          "ftpsState": "{{ ftpsState:string }}",
+          "minTlsVersion": "{{ minTlsVersion:string }}",
+          "http20Enabled": "{{ http20Enabled:boolean }}",
+          "functionsRuntimeScaleMonitoringEnabled": "{{ runtimeScaleMonitoringEnabled:boolean }}",
+          "preWarmedInstanceCount": "{{ preWarmedInstanceCount:number }}",
+          "appSettings": "{{ appSettings:array:object }}"
+        }
+      }
+    },
+    "defaults": {
+      "kind": "functionapp,linux",
+      "identityType": "SystemAssigned",
+      "httpsOnly": "true",
+      "publicNetworkAccess": "Enabled",
+      "frameworkVersion": "NODE|22",
+      "ftpsState": "Disabled",
+      "minTlsVersion": "1.2",
+      "http20Enabled": "true",
+      "runtimeScaleMonitoringEnabled": "false",
+      "appSettings": "[]"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "defaultHostName": "properties.defaultHostName",
+      "principalId": "identity.principalId"
+    }
+  },
+  {
+    "name": "Static Web App",
+    "abbreviation": "swa",
+    "isSystem": true,
+    "icon": "azure/Static-Apps.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "cmp"
+    },
+    "namingRule": {
+      "maxLength": 60,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Web/staticSites",
+      "apiVersion": "2023-12-01",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}",
+        "tier": "{{ skuTier:string }}"
+      },
+      "properties": {
+        "repositoryUrl": "{{ repositoryUrl:string }}",
+        "branch": "{{ branch:string }}",
+        "repositoryToken": "{{ repositoryToken:string }}",
+        "buildProperties": {
+          "appLocation": "{{ appLocation:string }}",
+          "apiLocation": "{{ apiLocation:string }}",
+          "outputLocation": "{{ outputLocation:string }}",
+          "appBuildCommand": "{{ appBuildCommand:string }}"
+        },
+        "stagingEnvironmentPolicy": "{{ stagingEnvironmentPolicy:string }}",
+        "allowConfigFileUpdates": "{{ allowConfigFileUpdates:boolean }}"
+      }
+    },
+    "defaults": {
+      "skuName": "Free",
+      "skuTier": "Free",
+      "branch": "main",
+      "appLocation": "/",
+      "outputLocation": "dist",
+      "stagingEnvironmentPolicy": "Enabled",
+      "allowConfigFileUpdates": "true"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "defaultHostname": "properties.defaultHostname"
+    }
+  },
+  {
+    "name": "Spring Apps",
+    "abbreviation": "spring",
+    "isSystem": true,
+    "icon": "azure/Azure-Spring-Apps.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "cmp"
+    },
+    "namingRule": {
+      "maxLength": 60,
+      "minLength": 4,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.AppPlatform/Spring",
+      "apiVersion": "2024-05-01-preview",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}",
+        "tier": "{{ skuTier:string }}",
+        "capacity": "{{ skuCapacity:number }}"
+      },
+      "properties": {
+        "zoneRedundant": "{{ zoneRedundant:boolean }}",
+        "networkProfile": {
+          "serviceRuntimeSubnetId": "{{ serviceRuntimeSubnetId:string }}",
+          "appSubnetId": "{{ appSubnetId:string }}"
+        }
+      }
+    },
+    "defaults": {
+      "skuName": "S0",
+      "skuTier": "Standard",
+      "skuCapacity": "1",
+      "zoneRedundant": "false"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "Storage Account",
+    "abbreviation": "st",
+    "isSystem": true,
+    "icon": "azure/Storage-Accounts.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "stg"
+    },
+    "namingRule": {
+      "maxLength": 24,
+      "minLength": 3,
+      "format": "{abbrv}{name}{region-abbrv}",
+      "forbiddenChars": [
+        "-",
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-05-01",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}"
+      },
+      "kind": "{{ kind:string }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "accessTier": "{{ accessTier:string }}",
+        "supportsHttpsTrafficOnly": "{{ supportsHttpsTrafficOnly:boolean }}",
+        "minimumTlsVersion": "{{ minimumTlsVersion:string }}",
+        "allowBlobPublicAccess": "{{ allowBlobPublicAccess:boolean }}",
+        "allowSharedKeyAccess": "{{ allowSharedKeyAccess:boolean }}",
+        "allowCrossTenantReplication": "{{ allowCrossTenantReplication:boolean }}",
+        "isHnsEnabled": "{{ isHnsEnabled:boolean }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "networkAcls": {
+          "defaultAction": "{{ networkDefaultAction:string }}",
+          "bypass": "{{ networkBypass:string }}"
+        },
+        "encryption": {
+          "services": {
+            "blob": {
+              "enabled": true
+            },
+            "file": {
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        }
+      }
+    },
+    "defaults": {
+      "skuName": "Standard_LRS",
+      "kind": "StorageV2",
+      "identityType": "SystemAssigned",
+      "accessTier": "Hot",
+      "supportsHttpsTrafficOnly": "true",
+      "minimumTlsVersion": "TLS1_2",
+      "allowBlobPublicAccess": "false",
+      "allowSharedKeyAccess": "true",
+      "allowCrossTenantReplication": "false",
+      "isHnsEnabled": "false",
+      "publicNetworkAccess": "Enabled",
+      "networkDefaultAction": "Allow",
+      "networkBypass": "AzureServices"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "primaryEndpoints": "properties.primaryEndpoints",
+      "connectionString": "storageAccountConnectionString"
+    }
+  },
+  {
+    "name": "Container Registry",
+    "abbreviation": "cr",
+    "isSystem": true,
+    "icon": "azure/Container-Registries.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "cmp"
+    },
+    "namingRule": {
+      "maxLength": 50,
+      "minLength": 5,
+      "format": "{abbrv}{name}{env}{region-abbrv}",
+      "forbiddenChars": [
+        "-",
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2023-11-01-preview",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}"
+      },
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "adminUserEnabled": "{{ adminUserEnabled:boolean }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "zoneRedundancy": "{{ zoneRedundancy:string }}",
+        "anonymousPullEnabled": "{{ anonymousPullEnabled:boolean }}",
+        "dataEndpointEnabled": "{{ dataEndpointEnabled:boolean }}",
+        "policies": {
+          "retentionPolicy": {
+            "days": "{{ retentionDays:number }}",
+            "status": "{{ retentionStatus:string }}"
+          },
+          "trustPolicy": {
+            "type": "Notary",
+            "status": "{{ trustPolicyStatus:string }}"
+          }
+        }
+      }
+    },
+    "defaults": {
+      "skuName": "Basic",
+      "identityType": "SystemAssigned",
+      "adminUserEnabled": "false",
+      "publicNetworkAccess": "Enabled",
+      "zoneRedundancy": "Disabled",
+      "anonymousPullEnabled": "false",
+      "dataEndpointEnabled": "false",
+      "retentionDays": "7",
+      "retentionStatus": "disabled",
+      "trustPolicyStatus": "disabled"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "loginServer": "properties.loginServer"
+    }
+  },
+  {
+    "name": "Container Instance",
+    "abbreviation": "cins",
+    "isSystem": true,
+    "icon": "azure/Container-Instances.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "cmp"
+    },
+    "namingRule": {
+      "maxLength": 63,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2023-05-01",
+      "tags": "{{ tags:object }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "containers": "{{ containers:array:object! }}",
+        "osType": "{{ osType:string }}",
+        "restartPolicy": "{{ restartPolicy:string }}",
+        "ipAddress": {
+          "type": "{{ ipAddressType:string }}",
+          "ports": "{{ ports:array:object }}",
+          "dnsNameLabel": "{{ dnsNameLabel:string }}"
+        },
+        "imageRegistryCredentials": "{{ imageRegistryCredentials:array:object }}",
+        "volumes": "{{ volumes:array:object }}"
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "osType": "Linux",
+      "restartPolicy": "Always",
+      "ipAddressType": "Public",
+      "containers": "[]",
+      "ports": "[]",
+      "imageRegistryCredentials": "[]",
+      "volumes": "[]"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "fqdn": "properties.ipAddress.fqdn",
+      "ip": "properties.ipAddress.ip"
+    }
+  },
+  {
+    "name": "Container Apps Environment",
+    "abbreviation": "cae",
+    "isSystem": true,
+    "icon": "azure/Container-Apps-Environments.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "cmp"
+    },
+    "namingRule": {
+      "maxLength": 32,
+      "minLength": 2,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.App/managedEnvironments",
+      "apiVersion": "2024-03-01",
+      "tags": "{{ tags:object }}",
+      "properties": {
+        "zoneRedundant": "{{ zoneRedundant:boolean }}",
+        "vnetConfiguration": {
+          "internal": "{{ vnetInternal:boolean }}",
+          "infrastructureSubnetId": "{{ infrastructureSubnetId:string }}"
+        },
+        "appLogsConfiguration": {
+          "destination": "{{ logDestination:string }}",
+          "logAnalyticsConfiguration": {
+            "customerId": "{{ logAnalyticsCustomerId:string }}",
+            "sharedKey": "{{ logAnalyticsSharedKey:string }}"
+          }
+        },
+        "workloadProfiles": "{{ workloadProfiles:array:object }}"
+      }
+    },
+    "defaults": {
+      "zoneRedundant": "false",
+      "vnetInternal": "false",
+      "logDestination": "log-analytics",
+      "workloadProfiles": "[{\"name\":\"Consumption\",\"workloadProfileType\":\"Consumption\"}]"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "defaultDomain": "properties.defaultDomain"
+    }
+  },
+  {
+    "name": "Container App",
+    "abbreviation": "ca",
+    "isSystem": true,
+    "icon": "azure/Container-Apps-Environments.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "cmp"
+    },
+    "namingRule": {
+      "maxLength": 32,
+      "minLength": 2,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.App/containerApps",
+      "apiVersion": "2024-03-01",
+      "tags": "{{ tags:object }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "managedEnvironmentId": "{{ managedEnvironmentId:string! }}",
+        "workloadProfileName": "{{ workloadProfileName:string }}",
+        "configuration": {
+          "activeRevisionsMode": "{{ activeRevisionsMode:string }}",
+          "ingress": {
+            "external": "{{ ingressExternal:boolean }}",
+            "targetPort": "{{ targetPort:number! }}",
+            "transport": "{{ ingressTransport:string }}",
+            "allowInsecure": "{{ ingressAllowInsecure:boolean }}"
+          },
+          "secrets": "{{ secrets:array:object }}",
+          "registries": "{{ registries:array:object }}"
+        },
+        "template": {
+          "containers": "{{ containers:array:object! }}",
+          "scale": {
+            "minReplicas": "{{ minReplicas:number }}",
+            "maxReplicas": "{{ maxReplicas:number }}",
+            "rules": "{{ scaleRules:array:object }}"
+          }
+        }
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "workloadProfileName": "Consumption",
+      "activeRevisionsMode": "Single",
+      "ingressExternal": "true",
+      "ingressTransport": "auto",
+      "ingressAllowInsecure": "false",
+      "secrets": "[]",
+      "registries": "[]",
+      "minReplicas": "0",
+      "maxReplicas": "10",
+      "scaleRules": "[]"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "fqdn": "properties.configuration.ingress.fqdn"
+    }
+  },
+  {
+    "name": "Kubernetes Service",
+    "abbreviation": "aks",
+    "isSystem": true,
+    "icon": "azure/Kubernetes-Services.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "cmp"
+    },
+    "namingRule": {
+      "maxLength": 63,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.ContainerService/managedClusters",
+      "apiVersion": "2024-05-01",
+      "tags": "{{ tags:object }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "sku": {
+        "name": "{{ skuName:string }}",
+        "tier": "{{ skuTier:string }}"
+      },
+      "properties": {
+        "dnsPrefix": "{{ dnsPrefix:string! }}",
+        "kubernetesVersion": "{{ kubernetesVersion:string }}",
+        "enableRBAC": "{{ enableRBAC:boolean }}",
+        "agentPoolProfiles": [
+          {
+            "name": "{{ nodePoolName:string }}",
+            "count": "{{ nodeCount:number! }}",
+            "vmSize": "{{ nodeVmSize:string! }}",
+            "mode": "System",
+            "osType": "{{ nodeOsType:string }}",
+            "type": "VirtualMachineScaleSets",
+            "enableAutoScaling": "{{ enableAutoScaling:boolean }}",
+            "minCount": "{{ nodeMinCount:number }}",
+            "maxCount": "{{ nodeMaxCount:number }}",
+            "availabilityZones": "{{ availabilityZones:array:string }}"
+          }
+        ],
+        "networkProfile": {
+          "networkPlugin": "{{ networkPlugin:string }}",
+          "networkPolicy": "{{ networkPolicy:string }}",
+          "loadBalancerSku": "{{ loadBalancerSku:string }}",
+          "serviceCidr": "{{ serviceCidr:string }}",
+          "dnsServiceIP": "{{ dnsServiceIP:string }}"
+        },
+        "addonProfiles": {
+          "azurepolicy": {
+            "enabled": "{{ enableAzurePolicy:boolean }}"
+          },
+          "omsagent": {
+            "enabled": "{{ enableMonitoring:boolean }}",
+            "config": {
+              "logAnalyticsWorkspaceResourceID": "{{ logAnalyticsWorkspaceResourceID:string }}"
+            }
+          }
+        },
+        "aadProfile": {
+          "managed": "{{ aadManaged:boolean }}",
+          "enableAzureRBAC": "{{ aadEnableAzureRBAC:boolean }}",
+          "tenantID": "{{ aadTenantId:string }}"
+        }
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "skuName": "Base",
+      "skuTier": "Free",
+      "kubernetesVersion": "1.30",
+      "enableRBAC": "true",
+      "nodePoolName": "nodepool1",
+      "nodeCount": "3",
+      "nodeVmSize": "Standard_DS2_v2",
+      "nodeOsType": "Linux",
+      "enableAutoScaling": "false",
+      "availabilityZones": "[]",
+      "networkPlugin": "azure",
+      "networkPolicy": "azure",
+      "loadBalancerSku": "standard",
+      "enableAzurePolicy": "false",
+      "enableMonitoring": "false",
+      "aadManaged": "true",
+      "aadEnableAzureRBAC": "true"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "fqdn": "properties.fqdn",
+      "principalId": "identity.principalId"
+    }
+  },
+  {
+    "name": "Azure SQL Server",
+    "abbreviation": "sql",
+    "isSystem": true,
+    "icon": "azure/SQL-Server.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "dbs"
+    },
+    "namingRule": {
+      "maxLength": 63,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": [
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2023-08-01-preview",
+      "tags": "{{ tags:object }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "administratorLogin": "{{ administratorLogin:string! }}",
+        "administratorLoginPassword": "{{ administratorLoginPassword:string! }}",
+        "version": "{{ version:string }}",
+        "minimalTlsVersion": "{{ minimalTlsVersion:string }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "administrators": {
+          "administratorType": "ActiveDirectory",
+          "login": "{{ aadAdminLogin:string }}",
+          "sid": "{{ aadAdminSid:string }}",
+          "tenantId": "{{ aadAdminTenantId:string }}",
+          "azureADOnlyAuthentication": "{{ aadOnlyAuth:boolean }}"
+        }
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "version": "12.0",
+      "minimalTlsVersion": "1.2",
+      "publicNetworkAccess": "Enabled",
+      "aadOnlyAuth": "false"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "fullyQualifiedDomainName": "properties.fullyQualifiedDomainName"
+    }
+  },
+  {
+    "name": "Azure SQL Database",
+    "abbreviation": "sqldb",
+    "isSystem": true,
+    "icon": "azure/Azure-SQL-VM.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "dbs"
+    },
+    "namingRule": {
+      "maxLength": 128,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2023-08-01-preview",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}",
+        "tier": "{{ skuTier:string }}",
+        "capacity": "{{ skuCapacity:number }}"
+      },
+      "properties": {
+        "collation": "{{ collation:string }}",
+        "maxSizeBytes": "{{ maxSizeBytes:number }}",
+        "zoneRedundant": "{{ zoneRedundant:boolean }}",
+        "readScale": "{{ readScale:string }}",
+        "requestedBackupStorageRedundancy": "{{ backupStorageRedundancy:string }}",
+        "isLedgerOn": "{{ isLedgerOn:boolean }}"
+      }
+    },
+    "defaults": {
+      "skuName": "S0",
+      "skuTier": "Standard",
+      "skuCapacity": "10",
+      "collation": "SQL_Latin1_General_CP1_CI_AS",
+      "maxSizeBytes": "268435456000",
+      "zoneRedundant": "false",
+      "readScale": "Disabled",
+      "backupStorageRedundancy": "Geo",
+      "isLedgerOn": "false"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "Cosmos DB Account",
+    "abbreviation": "cosmos",
+    "isSystem": true,
+    "icon": "azure/Azure-Cosmos-DB.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "dbs"
+    },
+    "namingRule": {
+      "maxLength": 44,
+      "minLength": 3,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": [
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.DocumentDB/databaseAccounts",
+      "apiVersion": "2024-05-15",
+      "tags": "{{ tags:object }}",
+      "kind": "{{ kind:string }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "databaseAccountOfferType": "Standard",
+        "consistencyPolicy": {
+          "defaultConsistencyLevel": "{{ defaultConsistencyLevel:string }}",
+          "maxIntervalInSeconds": "{{ maxIntervalInSeconds:number }}",
+          "maxStalenessPrefix": "{{ maxStalenessPrefix:number }}"
+        },
+        "locations": "{{ locations:array:object! }}",
+        "capabilities": "{{ capabilities:array:object }}",
+        "enableAutomaticFailover": "{{ enableAutomaticFailover:boolean }}",
+        "enableMultipleWriteLocations": "{{ enableMultipleWriteLocations:boolean }}",
+        "enableFreeTier": "{{ enableFreeTier:boolean }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "isVirtualNetworkFilterEnabled": "{{ isVirtualNetworkFilterEnabled:boolean }}",
+        "disableKeyBasedMetadataWriteAccess": "{{ disableKeyBasedMetadataWriteAccess:boolean }}",
+        "backupPolicy": {
+          "type": "{{ backupPolicyType:string }}"
+        }
+      }
+    },
+    "defaults": {
+      "kind": "GlobalDocumentDB",
+      "identityType": "SystemAssigned",
+      "defaultConsistencyLevel": "Session",
+      "maxIntervalInSeconds": "5",
+      "maxStalenessPrefix": "100",
+      "locations": "[{\"locationName\":\"West Europe\",\"failoverPriority\":0,\"isZoneRedundant\":false}]",
+      "capabilities": "[]",
+      "enableAutomaticFailover": "false",
+      "enableMultipleWriteLocations": "false",
+      "enableFreeTier": "false",
+      "publicNetworkAccess": "Enabled",
+      "isVirtualNetworkFilterEnabled": "false",
+      "disableKeyBasedMetadataWriteAccess": "false",
+      "backupPolicyType": "Continuous"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "documentEndpoint": "properties.documentEndpoint"
+    }
+  },
+  {
+    "name": "PostgreSQL Flexible Server",
+    "abbreviation": "psql",
+    "isSystem": true,
+    "icon": "azure/Azure-Database-PostgreSQL-Server.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "dbs"
+    },
+    "namingRule": {
+      "maxLength": 63,
+      "minLength": 3,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": [
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.DBforPostgreSQL/flexibleServers",
+      "apiVersion": "2024-03-01-preview",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}",
+        "tier": "{{ skuTier:string }}"
+      },
+      "properties": {
+        "version": "{{ version:string }}",
+        "administratorLogin": "{{ administratorLogin:string! }}",
+        "administratorLoginPassword": "{{ administratorLoginPassword:string! }}",
+        "createMode": "{{ createMode:string }}",
+        "availabilityZone": "{{ availabilityZone:string }}",
+        "storage": {
+          "storageSizeGB": "{{ storageSizeGB:number }}",
+          "autoGrow": "{{ storageAutoGrow:string }}"
+        },
+        "backup": {
+          "backupRetentionDays": "{{ backupRetentionDays:number }}",
+          "geoRedundantBackup": "{{ geoRedundantBackup:string }}"
+        },
+        "highAvailability": {
+          "mode": "{{ highAvailabilityMode:string }}",
+          "standbyAvailabilityZone": "{{ standbyAvailabilityZone:string }}"
+        },
+        "network": {
+          "delegatedSubnetResourceId": "{{ delegatedSubnetResourceId:string }}",
+          "privateDnsZoneArmResourceId": "{{ privateDnsZoneArmResourceId:string }}",
+          "publicNetworkAccess": "{{ publicNetworkAccess:string }}"
+        },
+        "authConfig": {
+          "activeDirectoryAuth": "{{ activeDirectoryAuth:string }}",
+          "passwordAuth": "{{ passwordAuth:string }}",
+          "tenantId": "{{ tenantId:string }}"
+        }
+      }
+    },
+    "defaults": {
+      "skuName": "Standard_B1ms",
+      "skuTier": "Burstable",
+      "version": "16",
+      "createMode": "Default",
+      "storageSizeGB": "32",
+      "storageAutoGrow": "Disabled",
+      "backupRetentionDays": "7",
+      "geoRedundantBackup": "Disabled",
+      "highAvailabilityMode": "Disabled",
+      "publicNetworkAccess": "Enabled",
+      "activeDirectoryAuth": "Disabled",
+      "passwordAuth": "Enabled"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "fullyQualifiedDomainName": "properties.fullyQualifiedDomainName"
+    }
+  },
+  {
+    "name": "MySQL Flexible Server",
+    "abbreviation": "mysql",
+    "isSystem": true,
+    "icon": "azure/Azure-Database-MySQL-Server.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "dbs"
+    },
+    "namingRule": {
+      "maxLength": 63,
+      "minLength": 3,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": [
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.DBforMySQL/flexibleServers",
+      "apiVersion": "2023-12-30",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}",
+        "tier": "{{ skuTier:string }}"
+      },
+      "properties": {
+        "version": "{{ version:string }}",
+        "administratorLogin": "{{ administratorLogin:string! }}",
+        "administratorLoginPassword": "{{ administratorLoginPassword:string! }}",
+        "createMode": "{{ createMode:string }}",
+        "availabilityZone": "{{ availabilityZone:string }}",
+        "storage": {
+          "storageSizeGB": "{{ storageSizeGB:number }}",
+          "iops": "{{ storageIops:number }}",
+          "autoGrow": "{{ storageAutoGrow:string }}",
+          "autoIoScaling": "{{ storageAutoIoScaling:string }}"
+        },
+        "backup": {
+          "backupRetentionDays": "{{ backupRetentionDays:number }}",
+          "geoRedundantBackup": "{{ geoRedundantBackup:string }}"
+        },
+        "highAvailability": {
+          "mode": "{{ highAvailabilityMode:string }}"
+        },
+        "network": {
+          "delegatedSubnetResourceId": "{{ delegatedSubnetResourceId:string }}",
+          "privateDnsZoneResourceId": "{{ privateDnsZoneResourceId:string }}",
+          "publicNetworkAccess": "{{ publicNetworkAccess:string }}"
+        }
+      }
+    },
+    "defaults": {
+      "skuName": "Standard_B1ms",
+      "skuTier": "Burstable",
+      "version": "8.0.21",
+      "createMode": "Default",
+      "storageSizeGB": "20",
+      "storageAutoGrow": "Disabled",
+      "backupRetentionDays": "7",
+      "geoRedundantBackup": "Disabled",
+      "highAvailabilityMode": "Disabled",
+      "publicNetworkAccess": "Enabled"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "fullyQualifiedDomainName": "properties.fullyQualifiedDomainName"
+    }
+  },
+  {
+    "name": "Redis Cache",
+    "abbreviation": "redis",
+    "isSystem": true,
+    "icon": "azure/Cache-Redis.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "dbs"
+    },
+    "namingRule": {
+      "maxLength": 63,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": [
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.Cache/redis",
+      "apiVersion": "2024-03-01",
+      "tags": "{{ tags:object }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "zones": "{{ zones:array:string }}",
+      "properties": {
+        "sku": {
+          "name": "{{ skuName:string }}",
+          "family": "{{ skuFamily:string }}",
+          "capacity": "{{ skuCapacity:number }}"
+        },
+        "enableNonSslPort": "{{ enableNonSslPort:boolean }}",
+        "minimumTlsVersion": "{{ minimumTlsVersion:string }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "redisVersion": "{{ redisVersion:string }}",
+        "redisConfiguration": "{{ redisConfiguration:object }}",
+        "subnetId": "{{ subnetId:string }}"
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "zones": "[]",
+      "skuName": "Basic",
+      "skuFamily": "C",
+      "skuCapacity": "0",
+      "enableNonSslPort": "false",
+      "minimumTlsVersion": "1.2",
+      "publicNetworkAccess": "Enabled",
+      "redisVersion": "6",
+      "redisConfiguration": "{}"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "hostName": "properties.hostName",
+      "sslPort": "properties.sslPort"
+    }
+  },
+  {
+    "name": "Synapse Workspace",
+    "abbreviation": "syn",
+    "isSystem": true,
+    "icon": "azure/Azure-Synapse-Analytics.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "ana"
+    },
+    "namingRule": {
+      "maxLength": 50,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": [
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.Synapse/workspaces",
+      "apiVersion": "2021-06-01",
+      "tags": "{{ tags:object }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "defaultDataLakeStorage": {
+          "accountUrl": "{{ defaultDataLakeAccountUrl:string! }}",
+          "filesystem": "{{ defaultDataLakeFilesystem:string! }}"
+        },
+        "sqlAdministratorLogin": "{{ sqlAdministratorLogin:string! }}",
+        "sqlAdministratorLoginPassword": "{{ sqlAdministratorLoginPassword:string! }}",
+        "managedVirtualNetwork": "{{ managedVirtualNetwork:string }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "managedResourceGroupName": "{{ managedResourceGroupName:string }}"
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "managedVirtualNetwork": "default",
+      "publicNetworkAccess": "Enabled"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "connectivityEndpoints": "properties.connectivityEndpoints"
+    }
+  },
+  {
+    "name": "Databricks Workspace",
+    "abbreviation": "dbw",
+    "isSystem": true,
+    "icon": "azure/Azure-Databricks.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "ana"
+    },
+    "namingRule": {
+      "maxLength": 64,
+      "minLength": 3,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Databricks/workspaces",
+      "apiVersion": "2024-05-01",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}"
+      },
+      "properties": {
+        "managedResourceGroupId": "{{ managedResourceGroupId:string! }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "requiredNsgRules": "{{ requiredNsgRules:string }}",
+        "parameters": {
+          "enableNoPublicIp": {
+            "value": "{{ enableNoPublicIp:boolean }}"
+          }
+        }
+      }
+    },
+    "defaults": {
+      "skuName": "premium",
+      "publicNetworkAccess": "Enabled",
+      "requiredNsgRules": "AllRules",
+      "enableNoPublicIp": "false"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "workspaceUrl": "properties.workspaceUrl"
+    }
+  },
+  {
+    "name": "Data Factory",
+    "abbreviation": "adf",
+    "isSystem": true,
+    "icon": "azure/Data-Factories.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "ana"
+    },
+    "namingRule": {
+      "maxLength": 63,
+      "minLength": 3,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": [
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.DataFactory/factories",
+      "apiVersion": "2018-06-01",
+      "tags": "{{ tags:object }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "globalParameters": "{{ globalParameters:object }}",
+        "repoConfiguration": "{{ repoConfiguration:object }}"
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "publicNetworkAccess": "Enabled"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "principalId": "identity.principalId"
+    }
+  },
+  {
+    "name": "Event Hub Namespace",
+    "abbreviation": "evh",
+    "isSystem": true,
+    "icon": "azure/Event-Hubs.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "int"
+    },
+    "namingRule": {
+      "maxLength": 50,
+      "minLength": 6,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": [
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.EventHub/namespaces",
+      "apiVersion": "2024-01-01",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}",
+        "tier": "{{ skuTier:string }}",
+        "capacity": "{{ skuCapacity:number }}"
+      },
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "isAutoInflateEnabled": "{{ isAutoInflateEnabled:boolean }}",
+        "maximumThroughputUnits": "{{ maximumThroughputUnits:number }}",
+        "kafkaEnabled": "{{ kafkaEnabled:boolean }}",
+        "zoneRedundant": "{{ zoneRedundant:boolean }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "minimumTlsVersion": "{{ minimumTlsVersion:string }}",
+        "disableLocalAuth": "{{ disableLocalAuth:boolean }}"
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "skuName": "Standard",
+      "skuTier": "Standard",
+      "skuCapacity": "1",
+      "isAutoInflateEnabled": "false",
+      "maximumThroughputUnits": "0",
+      "kafkaEnabled": "false",
+      "zoneRedundant": "true",
+      "publicNetworkAccess": "Enabled",
+      "minimumTlsVersion": "1.2",
+      "disableLocalAuth": "false"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "serviceBusEndpoint": "properties.serviceBusEndpoint"
+    }
+  },
+  {
+    "name": "Event Hub",
+    "abbreviation": "hub",
+    "isSystem": true,
+    "icon": "azure/Event-Hubs.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "int"
+    },
+    "namingRule": {
+      "maxLength": 256,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.EventHub/namespaces/eventhubs",
+      "apiVersion": "2024-01-01",
+      "properties": {
+        "messageRetentionInDays": "{{ messageRetentionInDays:number }}",
+        "partitionCount": "{{ partitionCount:number }}",
+        "status": "{{ status:string }}",
+        "captureDescription": {
+          "enabled": "{{ captureEnabled:boolean }}",
+          "encoding": "{{ captureEncoding:string }}",
+          "intervalInSeconds": "{{ captureIntervalInSeconds:number }}",
+          "sizeLimitInBytes": "{{ captureSizeLimitInBytes:number }}",
+          "destination": "{{ captureDestination:object }}"
+        }
+      }
+    },
+    "defaults": {
+      "messageRetentionInDays": "1",
+      "partitionCount": "2",
+      "status": "Active",
+      "captureEnabled": "false",
+      "captureEncoding": "Avro",
+      "captureIntervalInSeconds": "300",
+      "captureSizeLimitInBytes": "314572800"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "Event Grid Topic",
+    "abbreviation": "egt",
+    "isSystem": true,
+    "icon": "azure/Event-Grid-Topics.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "int"
+    },
+    "namingRule": {
+      "maxLength": 50,
+      "minLength": 3,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": [
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.EventGrid/topics",
+      "apiVersion": "2024-06-01-preview",
+      "tags": "{{ tags:object }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "inputSchema": "{{ inputSchema:string }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "minimumTlsVersionAllowed": "{{ minimumTlsVersionAllowed:string }}",
+        "disableLocalAuth": "{{ disableLocalAuth:boolean }}",
+        "dataResidencyBoundary": "{{ dataResidencyBoundary:string }}"
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "inputSchema": "EventGridSchema",
+      "publicNetworkAccess": "Enabled",
+      "minimumTlsVersionAllowed": "1.2",
+      "disableLocalAuth": "false",
+      "dataResidencyBoundary": "WithinGeopair"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "endpoint": "properties.endpoint"
+    }
+  },
+  {
+    "name": "Service Bus",
+    "abbreviation": "sbns",
+    "isSystem": true,
+    "icon": "azure/Service-Bus.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "int"
+    },
+    "namingRule": {
+      "maxLength": 50,
+      "minLength": 6,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": [
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.ServiceBus/namespaces",
+      "apiVersion": "2022-10-01-preview",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}",
+        "tier": "{{ skuTier:string }}",
+        "capacity": "{{ skuCapacity:number }}"
+      },
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "zoneRedundant": "{{ zoneRedundant:boolean }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "minimumTlsVersion": "{{ minimumTlsVersion:string }}",
+        "disableLocalAuth": "{{ disableLocalAuth:boolean }}"
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "skuName": "Standard",
+      "skuTier": "Standard",
+      "skuCapacity": "1",
+      "zoneRedundant": "false",
+      "publicNetworkAccess": "Enabled",
+      "minimumTlsVersion": "1.2",
+      "disableLocalAuth": "false"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "serviceBusEndpoint": "properties.serviceBusEndpoint"
+    }
+  },
+  {
+    "name": "Logic App",
+    "abbreviation": "logic",
+    "isSystem": true,
+    "icon": "azure/Logic-Apps.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "int"
+    },
+    "namingRule": {
+      "maxLength": 80,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2019-05-01",
+      "tags": "{{ tags:object }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "state": "{{ state:string }}",
+        "definition": "{{ definition:object! }}",
+        "parameters": "{{ parameters:object }}"
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "state": "Enabled",
+      "definition": "{\"$schema\":\"https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#\",\"contentVersion\":\"1.0.0.0\",\"triggers\":{},\"actions\":{},\"outputs\":{}}"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "accessEndpoint": "properties.accessEndpoint"
+    }
+  },
+  {
+    "name": "API Management",
+    "abbreviation": "apim",
+    "isSystem": true,
+    "icon": "azure/API-Management-Services.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "int"
+    },
+    "namingRule": {
+      "maxLength": 50,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.ApiManagement/service",
+      "apiVersion": "2023-09-01-preview",
+      "tags": "{{ tags:object }}",
+      "sku": {
+        "name": "{{ skuName:string }}",
+        "capacity": "{{ skuCapacity:number }}"
+      },
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "zones": "{{ zones:array:string }}",
+      "properties": {
+        "publisherEmail": "{{ publisherEmail:string! }}",
+        "publisherName": "{{ publisherName:string! }}",
+        "virtualNetworkType": "{{ virtualNetworkType:string }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "disableGateway": "{{ disableGateway:boolean }}",
+        "apiVersionConstraint": {
+          "minApiVersion": "{{ minApiVersion:string }}"
+        }
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "skuName": "Developer",
+      "skuCapacity": "1",
+      "zones": "[]",
+      "virtualNetworkType": "None",
+      "publicNetworkAccess": "Enabled",
+      "disableGateway": "false",
+      "minApiVersion": "2019-12-01"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "gatewayUrl": "properties.gatewayUrl"
+    }
+  },
+  {
+    "name": "Application Insights",
+    "abbreviation": "appi",
+    "isSystem": true,
+    "icon": "azure/Application-Insights.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "mon"
+    },
+    "namingRule": {
+      "maxLength": 260,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "tags": "{{ tags:object }}",
+      "kind": "{{ kind:string }}",
+      "properties": {
+        "Application_Type": "{{ applicationType:string }}",
+        "Flow_Type": "{{ flowType:string }}",
+        "Request_Source": "{{ requestSource:string }}",
+        "RetentionInDays": "{{ retentionInDays:number }}",
+        "IngestionMode": "{{ ingestionMode:string }}",
+        "WorkspaceResourceId": "{{ workspaceResourceId:string }}",
+        "publicNetworkAccessForIngestion": "{{ publicNetworkAccessForIngestion:string }}",
+        "publicNetworkAccessForQuery": "{{ publicNetworkAccessForQuery:string }}",
+        "DisableIpMasking": "{{ disableIpMasking:boolean }}",
+        "SamplingPercentage": "{{ samplingPercentage:number }}"
+      }
+    },
+    "defaults": {
+      "kind": "web",
+      "applicationType": "web",
+      "flowType": "Bluefield",
+      "requestSource": "rest",
+      "retentionInDays": "90",
+      "ingestionMode": "LogAnalytics",
+      "publicNetworkAccessForIngestion": "Enabled",
+      "publicNetworkAccessForQuery": "Enabled",
+      "disableIpMasking": "false",
+      "samplingPercentage": "100"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "instrumentationKey": "properties.InstrumentationKey",
+      "connectionString": "properties.ConnectionString"
+    }
+  },
+  {
+    "name": "Log Analytics Workspace",
+    "abbreviation": "log",
+    "isSystem": true,
+    "icon": "azure/Log-Analytics-Workspaces.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "mon"
+    },
+    "namingRule": {
+      "maxLength": 63,
+      "minLength": 4,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": [
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2023-09-01",
+      "tags": "{{ tags:object }}",
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "sku": {
+          "name": "{{ skuName:string }}"
+        },
+        "retentionInDays": "{{ retentionInDays:number }}",
+        "workspaceCapping": {
+          "dailyQuotaGb": "{{ dailyQuotaGb:number }}"
+        },
+        "publicNetworkAccessForIngestion": "{{ publicNetworkAccessForIngestion:string }}",
+        "publicNetworkAccessForQuery": "{{ publicNetworkAccessForQuery:string }}",
+        "features": {
+          "enableLogAccessUsingOnlyResourcePermissions": "{{ enableLogAccessUsingOnlyResourcePermissions:boolean }}"
+        }
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "skuName": "PerGB2018",
+      "retentionInDays": "30",
+      "dailyQuotaGb": "-1",
+      "publicNetworkAccessForIngestion": "Enabled",
+      "publicNetworkAccessForQuery": "Enabled",
+      "enableLogAccessUsingOnlyResourcePermissions": "true"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "customerId": "properties.customerId"
+    }
+  },
+  {
+    "name": "Metric Alert",
+    "abbreviation": "alrt",
+    "isSystem": true,
+    "icon": "azure/Alerts.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "mon"
+    },
+    "namingRule": {
+      "maxLength": 260,
+      "minLength": 1,
+      "format": "{abbrv}-{name}-{env}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.Insights/metricAlerts",
+      "apiVersion": "2018-03-01",
+      "location": "global",
+      "tags": "{{ tags:object }}",
+      "properties": {
+        "description": "{{ description:string }}",
+        "severity": "{{ severity:number }}",
+        "enabled": "{{ enabled:boolean }}",
+        "scopes": "{{ scopes:array:string! }}",
+        "evaluationFrequency": "{{ evaluationFrequency:string }}",
+        "windowSize": "{{ windowSize:string }}",
+        "targetResourceType": "{{ targetResourceType:string }}",
+        "targetResourceRegion": "{{ targetResourceRegion:string }}",
+        "criteria": "{{ criteria:object! }}",
+        "autoMitigate": "{{ autoMitigate:boolean }}",
+        "actions": "{{ actions:array:object }}"
+      }
+    },
+    "defaults": {
+      "severity": "3",
+      "enabled": "true",
+      "evaluationFrequency": "PT1M",
+      "windowSize": "PT5M",
+      "autoMitigate": "true",
+      "actions": "[]"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name"
+    }
+  },
+  {
+    "name": "Cognitive Services",
+    "abbreviation": "cog",
+    "isSystem": true,
+    "icon": "azure/Cognitive-Services.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "ana"
+    },
+    "namingRule": {
+      "maxLength": 64,
+      "minLength": 2,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.CognitiveServices/accounts",
+      "apiVersion": "2024-10-01",
+      "tags": "{{ tags:object }}",
+      "kind": "{{ kind:string! }}",
+      "sku": {
+        "name": "{{ skuName:string }}"
+      },
+      "identity": {
+        "type": "{{ identityType:string }}"
+      },
+      "properties": {
+        "customSubDomainName": "{{ customSubDomainName:string }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "disableLocalAuth": "{{ disableLocalAuth:boolean }}",
+        "restrictOutboundNetworkAccess": "{{ restrictOutboundNetworkAccess:boolean }}",
+        "networkAcls": {
+          "defaultAction": "{{ networkDefaultAction:string }}",
+          "virtualNetworkRules": "{{ networkVirtualNetworkRules:array:object }}",
+          "ipRules": "{{ networkIpRules:array:object }}"
+        }
+      }
+    },
+    "defaults": {
+      "identityType": "SystemAssigned",
+      "kind": "OpenAI",
+      "skuName": "S0",
+      "publicNetworkAccess": "Enabled",
+      "disableLocalAuth": "false",
+      "restrictOutboundNetworkAccess": "false",
+      "networkDefaultAction": "Allow",
+      "networkVirtualNetworkRules": "[]",
+      "networkIpRules": "[]"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "endpoint": "properties.endpoint",
+      "principalId": "identity.principalId"
+    }
+  },
+  {
+    "name": "Key Vault",
+    "abbreviation": "kv",
+    "isSystem": true,
+    "icon": "azure/Key-Vaults.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "inf"
+    },
+    "namingRule": {
+      "maxLength": 24,
+      "minLength": 3,
+      "format": "{abbrv}-{name}-{env}",
+      "forbiddenChars": [
+        "_",
+        "."
+      ]
+    },
+    "template": {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2024-04-01-preview",
+      "tags": "{{ tags:object }}",
+      "properties": {
+        "sku": {
+          "name": "{{ skuName:string }}",
+          "family": "{{ skuFamily:string }}"
+        },
+        "tenantId": "{{ tenantId:string! }}",
+        "enableRbacAuthorization": "{{ enableRBAC:boolean }}",
+        "enableSoftDelete": "{{ enableSoftDelete:boolean }}",
+        "softDeleteRetentionInDays": "{{ softDeleteRetention:number }}",
+        "enablePurgeProtection": "{{ enablePurgeProtection:boolean }}",
+        "enabledForDeployment": "{{ enabledForDeployment:boolean }}",
+        "enabledForTemplateDeployment": "{{ enabledForTemplateDeployment:boolean }}",
+        "enabledForDiskEncryption": "{{ enabledForDiskEncryption:boolean }}",
+        "publicNetworkAccess": "{{ publicNetworkAccess:string }}",
+        "networkAcls": {
+          "defaultAction": "{{ networkDefaultAction:string }}",
+          "bypass": "{{ networkBypass:string }}",
+          "virtualNetworkRules": "{{ networkVirtualNetworkRules:array:object }}",
+          "ipRules": "{{ networkIpRules:array:object }}"
+        },
+        "accessPolicies": "{{ accessPolicies:array:object }}"
+      }
+    },
+    "defaults": {
+      "skuName": "standard",
+      "skuFamily": "A",
+      "enableRBAC": "true",
+      "enableSoftDelete": "true",
+      "softDeleteRetention": "90",
+      "enablePurgeProtection": "false",
+      "enabledForDeployment": "false",
+      "enabledForTemplateDeployment": "false",
+      "enabledForDiskEncryption": "false",
+      "publicNetworkAccess": "Enabled",
+      "networkDefaultAction": "Allow",
+      "networkBypass": "AzureServices",
+      "networkVirtualNetworkRules": "[]",
+      "networkIpRules": "[]",
+      "accessPolicies": "[]"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "vaultUri": "properties.vaultUri"
+    }
+  },
+  {
+    "name": "User Assigned Identity",
+    "abbreviation": "id",
+    "isSystem": true,
+    "icon": "azure/Managed-Identities.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "idt"
+    },
+    "namingRule": {
+      "maxLength": 128,
+      "minLength": 3,
+      "format": "{abbrv}-{name}-{env}-{region-abbrv}",
+      "forbiddenChars": []
+    },
+    "template": {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "apiVersion": "2023-01-31",
+      "tags": "{{ tags:object }}",
+      "properties": {}
+    },
+    "defaults": {
+      "location": "westeurope"
+    },
+    "outputs": {
+      "id": "id",
+      "name": "name",
+      "principalId": "properties.principalId",
+      "clientId": "properties.clientId",
+      "tenantId": "properties.tenantId"
+    }
+  },
+  {
+    "name": "Create Entra User",
+    "abbreviation": "msgraph",
+    "isSystem": true,
+    "icon": "azure/Graph-Explorer.svg",
+    "type": "AZURE_RESOURCE",
+    "resourceCategory": {
+      "key": "msgraph"
+    },
+    "template": {
+      "method": "POST",
+      "contentType": "application/json",
+      "url": "https://graph.microsoft.com/v1.0/users",
+      "payload": {
+        "accountEnabled": true,
+        "displayName": "{{ displayName:string }}",
+        "userPrincipalName": "{{ principalName:string }}",
+        "passwordProfile": {
+          "forceChangePasswordNextSignIn": "{{ forceNewPassword:boolean }}",
+          "password": "{{ password:string! }}"
+        }
+      }
+    },
+    "defaults": {
+      "forceNewPassword": "false"
+    },
+    "outputs": {
+      "": ""
+    }
+  },
+  {
+    "name": "Create App Registration",
+    "abbreviation": "msgraph",
+    "isSystem": true,
+    "icon": "azure/Graph-Explorer.svg",
+    "type": "MSGRAPH",
+    "resourceCategory": {
+      "key": "msgraph",
+      "name": "MS Graph API"
+    },
+    "template": {
+      "method": "GET",
+      "contentType": "application/json",
+      "url": "https://graph.microsoft.com/v1.0/users",
+      "payload": {
+        "name": "{{ appName:string }}"
+      }
+    },
+    "defaults": {},
+    "outputs": {}
+  },
+  {
+    "name": "West Germany",
+    "isSystem": true,
+    "icon": "azure/Azure-Region.svg",
+    "type": "AZURE_REGION",
+    "resourceCategory": {
+      "key": "azreg",
+      "name": "Azure Region"
+    },
+    "template": {
+      "name": "West Europe",
+      "key": "westeurope",
+      "short": "westeu"
+    },
+    "defaults": {},
+    "outputs": {}
+  },
+  {
+    "name": "test",
+    "abbreviation": "cat-test",
+    "isSystem": true,
+    "icon": "generics/Catalog.svg",
+    "type": "CATALOG",
+    "resourceCategory": {
+      "key": "cat",
+      "name": "Catalog"
+    },
+    "template": {
+      "function": ""
+    },
+    "defaults": {},
+    "outputs": {},
+    "catalogDefinition": {
+      "itemType": "RESOURCE_CLASS"
+    }
+  },
+  {
+    "name": "allowed-plans",
+    "abbreviation": "cat-allowed-plans",
+    "isSystem": false,
+    "icon": "generics/Catalog.svg",
+    "type": "CATALOG",
+    "resourceCategory": {
+      "key": "cat",
+      "name": "Catalog"
+    },
+    "template": {
+      "consumption": {
+        "name": "Y1",
+        "tier": "ConsumptionY1"
+      },
+      "flex": {
+        "name": "FlexV2",
+        "tier": "FlexV2"
+      }
+    },
+    "defaults": {},
+    "outputs": {},
+    "catalogDefinition": {
+      "itemType": "OBJECT"
+    }
+  }
+]

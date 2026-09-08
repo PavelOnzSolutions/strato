@@ -1,0 +1,72 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    exclude:
+      - CHANGELOG.MD
+      - README.MD
+      - HELP.md
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  azureSubscription: 'FidooFXTest'  # Azure DevOps service connection
+  webAppName: 'app-arborist-dev'              # Azure Web App
+  javaVersion: '25'
+
+stages:
+  - stage: BuildAndDeploy
+    displayName: "Build and Deploy Spring Boot App"
+    jobs:
+      - job: BuildAndDeploy
+        steps:
+          - task: JavaToolInstaller@1
+            displayName: "Install JDK $(javaVersion)"
+            inputs:
+              versionSpec: '25'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+
+          - task: Gradle@3
+            displayName: "Run Tests"
+            continueOnError: true
+            inputs:
+              gradleWrapperFile: 'gradlew'
+              tasks: 'test'
+              publishJUnitResults: true
+              testResultsFiles: '**/build/test-results/test/*.xml'
+
+          - task: Gradle@3
+            displayName: "Run Coverage report"
+            continueOnError: true
+            inputs:
+              gradleWrapperFile: 'gradlew'
+              tasks: 'jacocoTestReport'
+
+          - task: PublishCodeCoverageResults@2
+            displayName: 'Publish Code Coverage'
+            inputs:
+              summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/build/reports/jacoco/test/jacocoTestReport.xml'
+
+
+
+          - task: Gradle@3
+            displayName: "Run bootJar"
+            inputs:
+              gradleWrapperFile: 'gradlew'
+              tasks: 'bootJar'
+
+          - script: mv build/libs/arborist*.jar build/libs/app.jar
+            displayName: "Rename JAR to app.jar"
+
+
+          # Deploy JAR directly without publishing an artifact
+          - task: AzureWebApp@1
+            displayName: "Deploy fat JAR to Azure Web App"
+            inputs:
+              appType: webAppLinux
+              azureSubscription: $(azureSubscription)
+              appName: $(webAppName)
+              package: "$(System.DefaultWorkingDirectory)/build/libs/app.jar"

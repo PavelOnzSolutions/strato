@@ -1,0 +1,19 @@
+openapi: 3.0.3
+info:
+  title: Environment Provisioner Service API
+  description: >
+    REST API for automating Azure environment creation, configuration, 
+    CMDB tracking, and issuing API tokens for CI/CD pipelines.
+  version: 1.0.0
+
+servers:
+  - url: https://api.example.com/v1
+
+tags:
+  - name: Auth
+  - name: Environments
+  - name: FunctionApps
+  - name: Pipelines
+  - name: CMDB
+
+

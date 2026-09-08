@@ -1,0 +1,20 @@
+[
+  {
+    "name": "West Europe",
+    "icon": "Azure-Region.svg",
+    "type": "AZURE_REGION",
+    "resourceCategory": {
+      "key": "azreg"
+    },
+    "template": {
+      "name": "West Europe",
+      "key": "westeu",
+      "short": "westeurope"
+    },
+    "defaults": {
+      "name": "West Europe",
+      "key": "westeu",
+      "short": "westeurope"
+    }
+  }
+]
